@@ -6,11 +6,8 @@ export const login = async (loginData) => {
   if (!password || !email) return { error: true, data: 'Todos los campos son obligatorios' }
   try {
     const response = await axios.post(`${url_prod}/api/users/login`, { password, email })
-
-    console.log(response)
-    return { error: true, data: response.data }
+    return { error: false, data: response.data }
   } catch (error) {
-    console.log(error)
-    return { error: true, data: error.message }
+    return { error: true, data: error.response.data }
   }
 }

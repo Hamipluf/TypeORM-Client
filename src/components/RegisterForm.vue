@@ -1,37 +1,117 @@
 <template>
-  <form class="form">
+  <form @submit.prevent="submitForm" class="form">
     <p class="title">Register</p>
     <div class="flex">
       <label>
-        <input class="input" type="text" placeholder="" required="" />
+        <input v-model="first_name" class="input" type="text" placeholder="" required="" />
         <span>Firstname</span>
       </label>
 
       <label>
-        <input class="input" type="text" placeholder="" required="" />
+        <input v-model="last_name" class="input" type="text" placeholder="" required="" />
         <span>Lastname</span>
       </label>
     </div>
 
     <label>
-      <input class="input" type="email" placeholder="" required="" />
+      <input v-model="email" class="input" type="email" placeholder="" required />
       <span>Email</span>
     </label>
 
     <label>
-      <input class="input" type="password" placeholder="" required="" />
+      <input v-model="password" class="input" :type="passwordFieldType" placeholder="" required />
       <span>Password</span>
+      <button class="toggle-pass" type="button" @click="togglePasswordVisibility">
+        {{ passwordFieldType === 'password' ? 'Show' : 'Hide' }}
+      </button>
     </label>
     <label>
-      <input class="input" type="password" placeholder="" required="" />
+      <input v-model="confirm_password" class="input" :type="passwordFieldType" placeholder="" required />
       <span>Confirm password</span>
     </label>
     <button class="submit">Submit</button>
-    <p class="signin">Already have an acount ? <a href="#">Signin</a></p>
+    <p class="signin">Already have an acount ? <a @click="this.$router.push('/login')">Login</a></p>
+    <p class='error-text' v-if="error">{{ error }}</p>
+
   </form>
 </template>
+<script>
+import { register } from '@/utils/auth/register'
+
+export default {
+  name: 'RegisterForm',
+  data() {
+    return {
+      first_name: '',
+      last_name: '',
+      email: '',
+      password: '',
+      confirm_password: '',
+      passwordInputType: 'password',
+      passwordFieldType: 'password',
+      error: '',
+    }
+  },
+  methods: {
+    async submitForm() {
+      const dataUser = {
+        first_name: this.first_name,
+        last_name: this.last_name,
+        email: this.email,
+        password: this.password,
+        confirm_password: this.confirm_password
+      }
+      try {
+        const response = await register(dataUser)
+        if (response.error) {
+          this.error = response.data
+          return
+        }
+        this.error = ''
+        localStorage.setItem('token', response.data.data.token)
+        return this.$router.push('/feed')
+      } catch (error) {
+        this.error = error.message
+        console.error('Error LOGINFORM:', error)
+      }
+    },
+    togglePasswordVisibility() {
+      this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password'
+    }
+  }
+}
+</script>
 
 <style scoped>
+.error-text {
+  color: red;
+  text-align: center;
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+
+}
+
+.toggle-pass {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #00bfff;
+  color: #fff;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  margin: 5px;
+  transition: all 30ms ease-in-out;
+}
+
+.toggle-pass:hover {
+  background-color: #00bfff96;
+}
+
+.toggle-pass:active {
+  transform: scale(.9);
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -116,7 +196,7 @@
   border-radius: 10px;
 }
 
-.form label .input + span {
+.form label .input+span {
   color: rgba(255, 255, 255, 0.5);
   position: absolute;
   left: 10px;
@@ -126,13 +206,13 @@
   transition: 0.3s ease;
 }
 
-.form label .input:placeholder-shown + span {
+.form label .input:placeholder-shown+span {
   top: 12.5px;
   font-size: 0.9em;
 }
 
-.form label .input:focus + span,
-.form label .input:valid + span {
+.form label .input:focus+span,
+.form label .input:valid+span {
   color: #00bfff;
   top: 0px;
   font-size: 0.7em;
@@ -152,10 +232,16 @@
   font-size: 16px;
   transform: 0.3s ease;
   background-color: #00bfff;
+  transition: all 30ms ease-in-out;
 }
 
 .submit:hover {
   background-color: #00bfff96;
+  cursor: pointer;
+}
+
+.submit:active {
+  transform: scale(.9);
 }
 
 @keyframes pulse {
