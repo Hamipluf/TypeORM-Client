@@ -1,10 +1,8 @@
-<script setup>
-import HeroComponent from '../components/LoginForm.vue'
-</script>
+<script setup></script>
 
 <template>
   <main>
-    <HeroComponent />
+    <h1>Hero</h1>
   </main>
 </template>
 

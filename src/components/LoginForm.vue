@@ -1,20 +1,33 @@
-<script setup></script>
 <template>
   <div class="form-container">
     <p class="title-container">Login</p>
-    <form class="form">
+    <form @submit.prevent="submitForm()" class="form">
       <div class="input-group">
-        <label for="username">Username</label>
-        <input type="text" name="username" id="username" placeholder="" />
+        <label for="username">Email</label>
+        <input
+          type="text"
+          name="email"
+          id="email"
+          placeholder="Email"
+          v-model="email"
+          autocomplete="username"
+        />
       </div>
       <div class="input-group">
         <label for="password">Password</label>
-        <input type="password" name="password" id="password" placeholder="" />
+        <input
+          type="password"
+          name="password"
+          id="password"
+          placeholder="Password"
+          v-model="password"
+          autocomplete="current-password"
+        />
         <div class="forgot">
           <a rel="noopener noreferrer" href="#">Forgot Password ?</a>
         </div>
       </div>
-      <button class="sign">Sign in</button>
+      <button type="submit" class="sign">Sign in</button>
     </form>
     <div class="social-message">
       <div class="line"></div>
@@ -50,6 +63,32 @@
     </p>
   </div>
 </template>
+<script>
+import { login } from '@/utils/auth/login'
+export default {
+  name: 'LoginForm',
+  data() {
+    return {
+      email: '',
+      password: ''
+    }
+  },
+  methods: {
+    async submitForm() {
+      const dataLogin = {
+        email: this.email,
+        password: this.password
+      }
+      try {
+        const response = await login(dataLogin)
+        console.log(response)
+      } catch (error) {
+        console.error('Error:', error.response ? error.response.data : error.message)
+      }
+    }
+  }
+}
+</script>
 
 <style scoped>
 .form-container-login {
@@ -160,6 +199,15 @@
   border: none;
   border-radius: 0.375rem;
   font-weight: 600;
+  transition: all 0.1s ease-in-out;
+}
+
+.sign:hover {
+  opacity: 80%;
+  cursor: pointer;
+}
+.sign:active {
+  transform: scale(0.9);
 }
 
 .social-message {
